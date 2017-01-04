@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TwitTry_A</string>
+    <string name="btn_login_text">Login via Twitter</string>
+</resources>
