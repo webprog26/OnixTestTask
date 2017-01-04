@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">TwitTry_A</string>
     <string name="btn_login_text">Login via Twitter</string>
+
+    <string name="menu_logOut">Log out</string>
+    <string name="menu_help">Help</string>
+
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
 </resources>
