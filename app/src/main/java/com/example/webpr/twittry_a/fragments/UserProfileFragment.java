@@ -3,11 +3,9 @@ package com.example.webpr.twittry_a.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.webpr.twittry_a.R;
@@ -34,6 +32,7 @@ public class UserProfileFragment extends TwitterFragment{
     private TextView mTvUserName;
 
     private Subscription mUserImageSubscription;
+    private ProgressBar mProgressBar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -61,6 +60,9 @@ public class UserProfileFragment extends TwitterFragment{
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
         mIvUserProfile = (ImageView) view.findViewById(R.id.ivUserProfile);
         mTvUserName = (TextView) view.findViewById(R.id.tvUserName);
 
@@ -79,10 +81,16 @@ public class UserProfileFragment extends TwitterFragment{
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
+                        if(mProgressBar.getVisibility() == View.VISIBLE){
+                            mProgressBar.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
                     public void onNext(Bitmap bitmap) {
+                        if(mProgressBar.getVisibility() == View.VISIBLE){
+                            mProgressBar.setVisibility(View.GONE);
+                        }
                         mIvUserProfile.setImageBitmap(bitmap);
                         mTvUserName.setText(mUser.getScreenName());
                     }

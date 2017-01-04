@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import twitter4j.User;
-
 /**
  * Created by webpr on 04.01.2017.
  */

@@ -11,14 +11,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.example.webpr.twittry_a.fragments.NewslineFragment;
 import com.example.webpr.twittry_a.fragments.UserProfileFragment;
 import com.example.webpr.twittry_a.twitter.TwitterSingleton;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
@@ -37,11 +37,14 @@ public class InnerActivity extends AppCompatActivity {
     private Toolbar mToolbar;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
+    private ProgressBar mProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inner);
+
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
@@ -76,10 +79,16 @@ public class InnerActivity extends AppCompatActivity {
                             @Override
                             public void onError(Throwable e) {
                                 e.printStackTrace();
+                                if(mProgressBar.getVisibility() == View.VISIBLE){
+                                    mProgressBar.setVisibility(View.GONE);
+                                }
                             }
 
                             @Override
                             public void onNext(User user) {
+                                if(mProgressBar.getVisibility() == View.VISIBLE){
+                                    mProgressBar.setVisibility(View.GONE);
+                                }
                                 if(null != user){
                                     initViewPagerWithAdapter(mViewPager, user);
                                     mTabLayout.setupWithViewPager(mViewPager);
@@ -144,7 +153,7 @@ public class InnerActivity extends AppCompatActivity {
 
     private void initViewPagerWithAdapter(ViewPager viewPager, User user){
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(NewslineFragment.newInstance(user), "Newsline");
+        adapter.addFragment(new NewslineFragment(), "Newsline");
         adapter.addFragment(UserProfileFragment.newInstance(user), "UserrProfile");
         viewPager.setAdapter(adapter);
     }
