@@ -18,11 +18,16 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.webpr.twittry_a.fragments.NewslineFragment;
 import com.example.webpr.twittry_a.fragments.UserProfileFragment;
+import com.example.webpr.twittry_a.interfaces.OnPageTitleChangedCallback;
+import com.example.webpr.twittry_a.managers.PageTitleManager;
 import com.example.webpr.twittry_a.twitter.TwitterSingleton;
+
 import java.util.ArrayList;
 import java.util.List;
 import rx.Subscriber;
@@ -35,29 +40,38 @@ import twitter4j.TwitterException;
 import twitter4j.User;
 import twitter4j.auth.AccessToken;
 
-public class InnerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class InnerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
+        View.OnClickListener, OnPageTitleChangedCallback{
 
     private static final String TAG = "InnerActivity_TAG";
 
     private Subscription mLoadUserSubscription;
-    private Toolbar mToolbar;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
     private ProgressBar mProgressBar;
     private DrawerLayout mDrawerLayout;
+    private TextView mTvPageTitle;
+    private List<String> mPageTitles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inner);
 
+        mPageTitles = new ArrayList<>();
+        mPageTitles.add(getResources().getString(R.string.timeline));
+        mPageTitles.add(getResources().getString(R.string.user_profile));
+
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
+        mToolbar.setContentInsetsAbsolute(0,0);
+
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
+        actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
         navigationView.setNavigationItemSelectedListener(this);
@@ -121,6 +135,14 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                 accessTokenPublishSubject.onCompleted();
             }
         }
+
+        ImageButton ibDrawerControl = (ImageButton) findViewById(R.id.ibDrawerControl);
+        ibDrawerControl.setOnClickListener(this);
+        mTvPageTitle = (TextView) findViewById(R.id.tvPageTitle);
+
+        if(null == mTvPageTitle.getText() || "".equals(mTvPageTitle.getText())){
+            mTvPageTitle.setText(mPageTitles.get(0));
+        }
     }
 
     @Override
@@ -145,6 +167,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
             super(fm);
         }
 
+
         @Override
         public Fragment getItem(int position) {
             return mFragments.get(position);
@@ -167,9 +190,13 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
     }
 
     private void initViewPagerWithAdapter(ViewPager viewPager, User user){
+        PageTitleManager pageTitleManager = new PageTitleManager(mPageTitles, InnerActivity.this);
+
+        viewPager.addOnPageChangeListener(pageTitleManager);
+
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new NewslineFragment(), "Newsline");
-        adapter.addFragment(UserProfileFragment.newInstance(user), "UserrProfile");
+        adapter.addFragment(new NewslineFragment(), mPageTitles.get(0));
+        adapter.addFragment(UserProfileFragment.newInstance(user), mPageTitles.get(1));
         viewPager.setAdapter(adapter);
     }
 
@@ -194,5 +221,23 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         } else {
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.ibDrawerControl:
+                if(mDrawerLayout.isDrawerOpen(GravityCompat.END)){
+                    mDrawerLayout.closeDrawer(GravityCompat.END);
+                } else {
+                    mDrawerLayout.openDrawer(GravityCompat.END);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onPageTitleChanged(String pageTitle) {
+        mTvPageTitle.setText(pageTitle);
     }
 }

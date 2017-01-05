@@ -7,4 +7,6 @@
 
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Close</string>
+    <string name="timeline">Timeline</string>
+    <string name="user_profile">User profile</string>
 </resources>

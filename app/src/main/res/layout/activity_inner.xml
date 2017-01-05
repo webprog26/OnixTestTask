@@ -23,7 +23,9 @@
             android:id="@+id/toolbar"
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            <include layout="@layout/toolbar"/>
+        </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
     <ProgressBar
         android:layout_width="wrap_content"
