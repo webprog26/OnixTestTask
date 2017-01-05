@@ -2,6 +2,7 @@ package com.example.webpr.twittry_a.fragments;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -24,6 +25,7 @@ import com.example.webpr.twittry_a.MainActivity;
 import com.example.webpr.twittry_a.R;
 import com.example.webpr.twittry_a.adapters.TweetsListAdapter;
 import com.example.webpr.twittry_a.adapters.TweetsListAdapterFull;
+import com.example.webpr.twittry_a.interfaces.OnTweetImageClickListener;
 import com.example.webpr.twittry_a.managers.BitmapDownloader;
 import com.example.webpr.twittry_a.models.Tweet;
 import com.example.webpr.twittry_a.twitter.TwitterSingleton;
@@ -47,7 +49,7 @@ import twitter4j.auth.AccessToken;
  * Created by webpr on 04.01.2017.
  */
 
-public class NewslineFragment extends TwitterFragment {
+public class NewslineFragment extends TwitterFragment implements OnTweetImageClickListener{
 
     private static final String TAG = "NewslineFragment";
 
@@ -127,7 +129,7 @@ public class NewslineFragment extends TwitterFragment {
                             mProgressBar.setVisibility(View.GONE);
                         }
                         mTweetList = tweets;
-                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList);
+                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, NewslineFragment.this);
                         mRecyclerView.setAdapter(adapter);
                     }
                 });
@@ -150,13 +152,18 @@ public class NewslineFragment extends TwitterFragment {
 
     public void changeViewMode(){
         if(!isInFullView){
-            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList);
+            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList, NewslineFragment.this);
             mRecyclerView.setAdapter(adapter);
             isInFullView = true;
         } else {
-            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList);
+            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, NewslineFragment.this);
             mRecyclerView.setAdapter(adapter);
             isInFullView = false;
         }
+    }
+
+    @Override
+    public void onTweetImageClick(Bitmap bitmap) {
+        Log.i(TAG, bitmap.toString());
     }
 }

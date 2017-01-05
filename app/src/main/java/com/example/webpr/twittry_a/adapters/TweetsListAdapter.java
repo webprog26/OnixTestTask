@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.webpr.twittry_a.R;
+import com.example.webpr.twittry_a.interfaces.OnTweetImageClickListener;
 import com.example.webpr.twittry_a.models.Tweet;
 
 import java.util.List;
@@ -19,9 +20,11 @@ import java.util.List;
 public class TweetsListAdapter extends RecyclerView.Adapter<TweetsListAdapter.TweetsListViewHolder>{
 
     private List<Tweet> mTweets;
+    private OnTweetImageClickListener mOnTweetImageClickListener;
 
-    public TweetsListAdapter(List<Tweet> mTweets) {
+    public TweetsListAdapter(List<Tweet> mTweets, OnTweetImageClickListener onTweetImageClickListener) {
         this.mTweets = mTweets;
+        this.mOnTweetImageClickListener = onTweetImageClickListener;
     }
 
     @Override
@@ -32,7 +35,7 @@ public class TweetsListAdapter extends RecyclerView.Adapter<TweetsListAdapter.Tw
 
     @Override
     public void onBindViewHolder(TweetsListViewHolder holder, int position) {
-        holder.bind(mTweets.get(position));
+        holder.bind(mTweets.get(position), mOnTweetImageClickListener);
     }
 
     @Override
@@ -53,11 +56,18 @@ public class TweetsListAdapter extends RecyclerView.Adapter<TweetsListAdapter.Tw
             mIvTweetImage = (ImageView) itemView.findViewById(R.id.ivTweetImage);
         }
 
-        public void bind(final Tweet tweet){
+        public void bind(final Tweet tweet, final OnTweetImageClickListener onTweetImageClickListener){
 
             mTvUserName.setText(tweet.getUserName());
             mTvTweetText.setText(tweet.getText());
             mIvTweetImage.setImageBitmap(tweet.getImage());
+
+            mIvTweetImage.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onTweetImageClickListener.onTweetImageClick(tweet.getImage());
+                }
+            });
         }
 
     }
