@@ -6,27 +6,28 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.webpr.twittry_a.InnerActivity;
 import com.example.webpr.twittry_a.MainActivity;
 import com.example.webpr.twittry_a.R;
+import com.example.webpr.twittry_a.adapters.TweetsListAdapter;
+import com.example.webpr.twittry_a.adapters.TweetsListAdapterFull;
 import com.example.webpr.twittry_a.managers.BitmapDownloader;
 import com.example.webpr.twittry_a.models.Tweet;
 import com.example.webpr.twittry_a.twitter.TwitterSingleton;
 
-import org.w3c.dom.Text;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,6 @@ import twitter4j.MediaEntity;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.User;
 import twitter4j.auth.AccessToken;
 
 /**
@@ -51,9 +51,11 @@ public class NewslineFragment extends TwitterFragment {
 
     private static final String TAG = "NewslineFragment";
 
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private Subscription mUserTimeLineSubscription;
     private ProgressBar mProgressBar;
+    private List<Tweet> mTweetList;
+    private boolean isInFullView = false;
 
     @Override
     protected int getLayout() {
@@ -63,10 +65,14 @@ public class NewslineFragment extends TwitterFragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mTweetList = new ArrayList<>();
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
-        mListView = (ListView) view.findViewById(R.id.listView);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(false);
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         PublishSubject<AccessToken> userTimelinePublishSubject = PublishSubject.create();
         mUserTimeLineSubscription = userTimelinePublishSubject.observeOn(Schedulers.io())
@@ -90,6 +96,7 @@ public class NewslineFragment extends TwitterFragment {
                             builder.setId(status.getId())
                                     .setUserName(status.getUser().getName())
                                     .setText(status.getText());
+                                    Log.i(TAG, status.getText());
                                     for(MediaEntity mediaEntity: status.getMediaEntities()){
                                         if(mediaEntity.getMediaURL().endsWith("jpg")){
                                             builder.setImage(BitmapDownloader.getBitmapFromURL(mediaEntity.getMediaURL()));
@@ -119,8 +126,9 @@ public class NewslineFragment extends TwitterFragment {
                         if(mProgressBar.getVisibility() == View.VISIBLE){
                             mProgressBar.setVisibility(View.GONE);
                         }
-                        ListViewAdapter adapter = new ListViewAdapter(getActivity(), tweets);
-                        mListView.setAdapter(adapter);
+                        mTweetList = tweets;
+                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList);
+                        mRecyclerView.setAdapter(adapter);
                     }
                 });
 
@@ -140,30 +148,15 @@ public class NewslineFragment extends TwitterFragment {
         }
     }
 
-    private static class ListViewAdapter extends ArrayAdapter<Tweet>{
-
-        public ListViewAdapter(Context context, List<Tweet> tweets) {
-            super(context, 0, tweets);
-        }
-
-        @NonNull
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if(convertView == null){
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.tweet_item, null);
-            }
-
-            TextView tvUserName = (TextView) convertView.findViewById(R.id.tvTweetUserName);
-            TextView tvTweetText = (TextView) convertView.findViewById(R.id.tvTweetText);
-            ImageView ivTweetImage = (ImageView) convertView.findViewById(R.id.ivTweetImage);
-
-            Tweet tweet = getItem(position);
-
-            tvUserName.setText(tweet.getUserName());
-            tvTweetText.setText(tweet.getText());
-            ivTweetImage.setImageBitmap(tweet.getImage());
-
-            return convertView;
+    public void changeViewMode(){
+        if(!isInFullView){
+            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList);
+            mRecyclerView.setAdapter(adapter);
+            isInFullView = true;
+        } else {
+            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList);
+            mRecyclerView.setAdapter(adapter);
+            isInFullView = false;
         }
     }
 }

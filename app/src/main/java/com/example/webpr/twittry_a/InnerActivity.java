@@ -52,6 +52,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
     private DrawerLayout mDrawerLayout;
     private TextView mTvPageTitle;
     private List<String> mPageTitles;
+    private ViewPagerAdapter mViewPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,6 +144,9 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         if(null == mTvPageTitle.getText() || "".equals(mTvPageTitle.getText())){
             mTvPageTitle.setText(mPageTitles.get(0));
         }
+
+        ImageButton ibDescription = (ImageButton) findViewById(R.id.ibDescription);
+        ibDescription.setOnClickListener(this);
     }
 
     @Override
@@ -187,6 +191,15 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         public CharSequence getPageTitle(int position) {
             return mFragmentsTitles.get(position);
         }
+
+        public Fragment getNewslineFragment(){
+            for(Fragment fragment: mFragments){
+                if(fragment instanceof NewslineFragment){
+                    return fragment;
+                }
+            }
+            return null;
+        }
     }
 
     private void initViewPagerWithAdapter(ViewPager viewPager, User user){
@@ -194,10 +207,10 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
 
         viewPager.addOnPageChangeListener(pageTitleManager);
 
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new NewslineFragment(), mPageTitles.get(0));
-        adapter.addFragment(UserProfileFragment.newInstance(user), mPageTitles.get(1));
-        viewPager.setAdapter(adapter);
+        mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mViewPagerAdapter.addFragment(new NewslineFragment(), mPageTitles.get(0));
+        mViewPagerAdapter.addFragment(UserProfileFragment.newInstance(user), mPageTitles.get(1));
+        viewPager.setAdapter(mViewPagerAdapter);
     }
 
     @Override
@@ -231,6 +244,14 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                     mDrawerLayout.closeDrawer(GravityCompat.END);
                 } else {
                     mDrawerLayout.openDrawer(GravityCompat.END);
+                }
+                break;
+            case R.id.ibDescription:
+                if(null != mViewPagerAdapter){
+                    NewslineFragment newslineFragment = (NewslineFragment) mViewPagerAdapter.getNewslineFragment();
+                    if(null != newslineFragment){
+                        newslineFragment.changeViewMode();
+                    }
                 }
                 break;
         }
