@@ -22,7 +22,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.webpr.twittry_a.fragments.NewslineFragment;
+import com.example.webpr.twittry_a.fragments.TimelineFragment;
 import com.example.webpr.twittry_a.fragments.UserProfileFragment;
 import com.example.webpr.twittry_a.interfaces.OnPageTitleChangedCallback;
 import com.example.webpr.twittry_a.managers.PageTitleManager;
@@ -194,7 +194,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
 
         public Fragment getNewslineFragment(){
             for(Fragment fragment: mFragments){
-                if(fragment instanceof NewslineFragment){
+                if(fragment instanceof TimelineFragment){
                     return fragment;
                 }
             }
@@ -208,7 +208,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         viewPager.addOnPageChangeListener(pageTitleManager);
 
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFragment(new NewslineFragment(), mPageTitles.get(0));
+        mViewPagerAdapter.addFragment(new TimelineFragment(), mPageTitles.get(0));
         mViewPagerAdapter.addFragment(UserProfileFragment.newInstance(user), mPageTitles.get(1));
         viewPager.setAdapter(mViewPagerAdapter);
     }
@@ -248,7 +248,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                 break;
             case R.id.ibDescription:
                 if(null != mViewPagerAdapter){
-                    NewslineFragment newslineFragment = (NewslineFragment) mViewPagerAdapter.getNewslineFragment();
+                    TimelineFragment newslineFragment = (TimelineFragment) mViewPagerAdapter.getNewslineFragment();
                     if(null != newslineFragment){
                         newslineFragment.changeViewMode();
                     }

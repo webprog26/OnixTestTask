@@ -67,7 +67,7 @@ public class TweetsListAdapterFull extends RecyclerView.Adapter<TweetsListAdapte
             mIvTweetImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    onTweetImageClickListener.onTweetImageClick(tweet.getImage());
+                    onTweetImageClickListener.onTweetImageClick(tweet.getImageUrl());
                 }
             });
         }

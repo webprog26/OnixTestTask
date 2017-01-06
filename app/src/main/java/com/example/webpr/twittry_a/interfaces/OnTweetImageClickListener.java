@@ -9,5 +9,5 @@ import android.widget.ImageView;
 
 public interface OnTweetImageClickListener {
 
-    public void onTweetImageClick(Bitmap bitmap);
+    public void onTweetImageClick(String bitmapUrl);
 }

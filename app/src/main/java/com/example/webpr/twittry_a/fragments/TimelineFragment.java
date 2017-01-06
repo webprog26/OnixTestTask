@@ -1,28 +1,21 @@
 package com.example.webpr.twittry_a.fragments;
 
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.example.webpr.twittry_a.MainActivity;
 import com.example.webpr.twittry_a.R;
+import com.example.webpr.twittry_a.TweetImageActivity;
 import com.example.webpr.twittry_a.adapters.TweetsListAdapter;
 import com.example.webpr.twittry_a.adapters.TweetsListAdapterFull;
 import com.example.webpr.twittry_a.interfaces.OnTweetImageClickListener;
@@ -49,9 +42,9 @@ import twitter4j.auth.AccessToken;
  * Created by webpr on 04.01.2017.
  */
 
-public class NewslineFragment extends TwitterFragment implements OnTweetImageClickListener{
+public class TimelineFragment extends TwitterFragment implements OnTweetImageClickListener{
 
-    private static final String TAG = "NewslineFragment";
+    private static final String TAG = "TimelineFragment";
 
     private RecyclerView mRecyclerView;
     private Subscription mUserTimeLineSubscription;
@@ -98,9 +91,10 @@ public class NewslineFragment extends TwitterFragment implements OnTweetImageCli
                             builder.setId(status.getId())
                                     .setUserName(status.getUser().getName())
                                     .setText(status.getText());
-                                    Log.i(TAG, status.getText());
                                     for(MediaEntity mediaEntity: status.getMediaEntities()){
-                                        if(mediaEntity.getMediaURL().endsWith("jpg")){
+                                        String mediaImageUrl = mediaEntity.getMediaURL();
+                                        if(mediaImageUrl.endsWith("jpg")){
+                                            builder.setImageUrl(mediaImageUrl);
                                             builder.setImage(BitmapDownloader.getBitmapFromURL(mediaEntity.getMediaURL()));
                                             break;
                                         }
@@ -129,7 +123,7 @@ public class NewslineFragment extends TwitterFragment implements OnTweetImageCli
                             mProgressBar.setVisibility(View.GONE);
                         }
                         mTweetList = tweets;
-                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, NewslineFragment.this);
+                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, TimelineFragment.this);
                         mRecyclerView.setAdapter(adapter);
                     }
                 });
@@ -152,18 +146,21 @@ public class NewslineFragment extends TwitterFragment implements OnTweetImageCli
 
     public void changeViewMode(){
         if(!isInFullView){
-            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList, NewslineFragment.this);
+            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList, TimelineFragment.this);
             mRecyclerView.setAdapter(adapter);
             isInFullView = true;
         } else {
-            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, NewslineFragment.this);
+            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, TimelineFragment.this);
             mRecyclerView.setAdapter(adapter);
             isInFullView = false;
         }
     }
 
     @Override
-    public void onTweetImageClick(Bitmap bitmap) {
-        Log.i(TAG, bitmap.toString());
+    public void onTweetImageClick(String bitmapUrl) {
+        Log.i(TAG, bitmapUrl.toString());
+        Intent tweetImageIntent = new Intent(getActivity(), TweetImageActivity.class);
+        tweetImageIntent.putExtra(TweetImageActivity.TWEET_IMAGE_SEPARATE_VIEW, bitmapUrl);
+        startActivity(tweetImageIntent);
     }
 }

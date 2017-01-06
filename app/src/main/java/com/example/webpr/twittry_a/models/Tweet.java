@@ -13,6 +13,7 @@ public class Tweet {
     private String mUserName;
     private String mText;
     private Bitmap mImage;
+    private String mImageUrl;
 
     public long getId() {
         return mId;
@@ -28,6 +29,10 @@ public class Tweet {
 
     public Bitmap getImage() {
         return mImage;
+    }
+
+    public String getImageUrl() {
+        return mImageUrl;
     }
 
     public static Builder newBuilder(){
@@ -48,6 +53,11 @@ public class Tweet {
 
         public Builder setText(String text){
             Tweet.this.mText = text;
+            return this;
+        }
+
+        public Builder setImageUrl(String imageUrl){
+            Tweet.this.mImageUrl = imageUrl;
             return this;
         }
 
