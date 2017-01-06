@@ -15,7 +15,7 @@
     tools:context="com.example.webpr.twittry_a.InnerActivity">
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="?attr/actionBarSize"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
@@ -24,7 +24,9 @@
             android:background="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-            <include layout="@layout/toolbar"/>
+            <include layout="@layout/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"/>
         </android.support.v7.widget.Toolbar>
     </android.support.design.widget.AppBarLayout>
     <ProgressBar
@@ -52,8 +54,9 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginTop="?android:attr/actionBarSize"
+        android:paddingTop="0dp"
         android:id="@+id/navView"
         android:layout_gravity="end"
-        android:fitsSystemWindows="true"
-        app:menu="@menu/nav_menu"/>
+        app:menu="@menu/nav_menu"
+        android:fitsSystemWindows="true" />
 </android.support.v4.widget.DrawerLayout>

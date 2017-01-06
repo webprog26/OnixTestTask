@@ -14,6 +14,11 @@ import java.net.URL;
 
 public class BitmapDownloader {
 
+    /**
+     * Downloads bitmap image from given url
+     * @param src {@link String}
+     * @return {@link Bitmap}
+     */
     public static Bitmap getBitmapFromURL(String src) {
         try {
             URL url = new URL(src);

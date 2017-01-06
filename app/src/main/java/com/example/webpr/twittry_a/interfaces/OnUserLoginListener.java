@@ -6,5 +6,9 @@ package com.example.webpr.twittry_a.interfaces;
 
 public interface OnUserLoginListener {
 
+    /**
+     * Shares auth URL with MainActivity
+     * @param authUrl
+     */
     public void onUserLogin(String authUrl);
 }

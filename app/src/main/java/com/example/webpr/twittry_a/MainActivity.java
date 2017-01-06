@@ -176,6 +176,11 @@ public class MainActivity extends AppCompatActivity implements OnUserLoginListen
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Saves useful data via using {@link SharedPreferences}
+     * @param sharedPreferences {@link SharedPreferences}
+     * @param accessToken {@link AccessToken}
+     */
     private void saveUserInfo(SharedPreferences sharedPreferences, AccessToken accessToken){
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(PREF_KEY_OAUTH_TOKEN, accessToken.getToken()).apply();

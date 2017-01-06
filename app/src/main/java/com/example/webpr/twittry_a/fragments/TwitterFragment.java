@@ -15,6 +15,10 @@ public abstract class TwitterFragment extends Fragment {
 
     public static final String USER_BUNDLE = "com.example.webprog26.twittry_a.user_bundle";
 
+    /**
+     * Returns current xml-layout id
+     * @return int
+     */
     protected abstract int getLayout();
 
     @Nullable

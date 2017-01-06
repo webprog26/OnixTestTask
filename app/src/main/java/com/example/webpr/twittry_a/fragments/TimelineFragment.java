@@ -2,7 +2,6 @@ package com.example.webpr.twittry_a.fragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -144,6 +143,9 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
         }
     }
 
+    /**
+     * Changes the mode of the tweets from short ru fullscreen and backward
+     */
     public void changeViewMode(){
         if(!isInFullView){
             TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList, TimelineFragment.this);

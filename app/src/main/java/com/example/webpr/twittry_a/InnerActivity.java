@@ -1,5 +1,6 @@
 package com.example.webpr.twittry_a;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
@@ -24,7 +25,7 @@ import android.widget.TextView;
 
 import com.example.webpr.twittry_a.fragments.TimelineFragment;
 import com.example.webpr.twittry_a.fragments.UserProfileFragment;
-import com.example.webpr.twittry_a.interfaces.OnPageTitleChangedCallback;
+import com.example.webpr.twittry_a.interfaces.OnPageChangedCallback;
 import com.example.webpr.twittry_a.managers.PageTitleManager;
 import com.example.webpr.twittry_a.twitter.TwitterSingleton;
 
@@ -41,7 +42,7 @@ import twitter4j.User;
 import twitter4j.auth.AccessToken;
 
 public class InnerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
-        View.OnClickListener, OnPageTitleChangedCallback{
+        View.OnClickListener, OnPageChangedCallback {
 
     private static final String TAG = "InnerActivity_TAG";
 
@@ -53,11 +54,16 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
     private TextView mTvPageTitle;
     private List<String> mPageTitles;
     private ViewPagerAdapter mViewPagerAdapter;
+    private AccessToken mAccessToken;
+    private SharedPreferences mSharedPreferences;
+    private ImageButton mIbDescription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inner);
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(InnerActivity.this);
+
 
         mPageTitles = new ArrayList<>();
         mPageTitles.add(getResources().getString(R.string.timeline));
@@ -68,14 +74,21 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         setSupportActionBar(mToolbar);
         mToolbar.setContentInsetsAbsolute(0,0);
 
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this,
+                mDrawerLayout,
+                mToolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
 
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawerLayout.addDrawerListener(actionBarDrawerToggle);
         actionBarDrawerToggle.syncState();
         actionBarDrawerToggle.setDrawerIndicatorEnabled(false);
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.navView);
         navigationView.setNavigationItemSelectedListener(this);
+
+        mIbDescription = (ImageButton) findViewById(R.id.ibDescription);
+        mIbDescription.setOnClickListener(this);
 
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
@@ -86,6 +99,9 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         if(null != getIntent()){
             User user = (User) getIntent().getSerializableExtra(MainActivity.LOGGED_IN_USER);
             if(null != user){
+                if(mProgressBar.getVisibility() == View.VISIBLE){
+                    mProgressBar.setVisibility(View.GONE);
+                }
                initViewPagerWithAdapter(mViewPager, user);
                mTabLayout.setupWithViewPager(mViewPager);
             } else {
@@ -95,7 +111,9 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                             @Override
                             public User call(AccessToken accessToken) {
                                 try{
-                                    return TwitterSingleton.getInstance().getAuthorizedTwitter(accessToken).showUser(accessToken.getUserId());
+                                    return TwitterSingleton.getInstance()
+                                            .getAuthorizedTwitter(accessToken)
+                                            .showUser(accessToken.getUserId());
                                 } catch (TwitterException te){
                                     te.printStackTrace();
                                 }
@@ -119,6 +137,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                                 if(mProgressBar.getVisibility() == View.VISIBLE){
                                     mProgressBar.setVisibility(View.GONE);
                                 }
+                                Log.i(TAG, "onNext mProgressBar.getVisibility() " + mProgressBar.getVisibility());
                                 if(null != user){
                                     initViewPagerWithAdapter(mViewPager, user);
                                     mTabLayout.setupWithViewPager(mViewPager);
@@ -128,11 +147,10 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                             }
                         });
 
-                final SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(InnerActivity.this);
-                final AccessToken accessToken = new AccessToken(
-                        sharedPreferences.getString(MainActivity.PREF_KEY_OAUTH_TOKEN, null),
-                        sharedPreferences.getString(MainActivity.PREF_KEY_OAUTH_SECRET, null));
-                accessTokenPublishSubject.onNext(accessToken);
+                mAccessToken = new AccessToken(
+                        mSharedPreferences.getString(MainActivity.PREF_KEY_OAUTH_TOKEN, null),
+                        mSharedPreferences.getString(MainActivity.PREF_KEY_OAUTH_SECRET, null));
+                accessTokenPublishSubject.onNext(mAccessToken);
                 accessTokenPublishSubject.onCompleted();
             }
         }
@@ -144,9 +162,6 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         if(null == mTvPageTitle.getText() || "".equals(mTvPageTitle.getText())){
             mTvPageTitle.setText(mPageTitles.get(0));
         }
-
-        ImageButton ibDescription = (ImageButton) findViewById(R.id.ibDescription);
-        ibDescription.setOnClickListener(this);
     }
 
     @Override
@@ -202,8 +217,13 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
         }
     }
 
+    /**
+     * Inits {@link ViewPager} with {@link ViewPagerAdapter} and {@link PageTitleManager}
+     * @param viewPager {@link ViewPager}
+     * @param user {@link User}
+     */
     private void initViewPagerWithAdapter(ViewPager viewPager, User user){
-        PageTitleManager pageTitleManager = new PageTitleManager(mPageTitles, InnerActivity.this);
+        PageTitleManager pageTitleManager = new PageTitleManager(mPageTitles, InnerActivity.this, mIbDescription);
 
         viewPager.addOnPageChangeListener(pageTitleManager);
 
@@ -220,7 +240,17 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                 Log.i(TAG, "Menu help selected");
                 break;
             case R.id.nav_logOut:
-                Log.i(TAG, "Menu LogOut selected");
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+
+                editor.remove(MainActivity.PREF_KEY_OAUTH_TOKEN);
+                editor.remove(MainActivity.PREF_KEY_OAUTH_TOKEN);
+                editor.putBoolean(MainActivity.IS_USER_LOGGED_IN, false);
+                editor.apply();
+
+                TwitterSingleton.getInstance().getAuthorizedTwitter(mAccessToken).setOAuthAccessToken(null);
+
+                startActivity(new Intent(InnerActivity.this, MainActivity.class));
+                finish();
                 break;
         }
         mDrawerLayout.closeDrawer(GravityCompat.END);

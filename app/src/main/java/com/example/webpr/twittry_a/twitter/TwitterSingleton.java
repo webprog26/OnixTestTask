@@ -27,6 +27,10 @@ public class TwitterSingleton {
         this.mTwitter = new TwitterFactory(configuration).getInstance();
     }
 
+    /**
+     * Returns instance of {@link TwitterSingleton}
+     * @return {@link TwitterSingleton}
+     */
     public static TwitterSingleton getInstance(){
         if(instance == null){
             instance = new TwitterSingleton();
@@ -34,10 +38,20 @@ public class TwitterSingleton {
         return instance;
     }
 
+    /**
+     * Returns insance of {@link Twitter}
+     * @return {@link Twitter}
+     *
+     */
     public Twitter getTwitter(){
         return mTwitter;
     }
 
+    /**
+     * Returns insance of {@link Twitter} built upon received {@link AccessToken}
+     * @return {@link Twitter}
+     *
+     */
     public Twitter getAuthorizedTwitter(AccessToken accessToken){
         ConfigurationBuilder builder = new ConfigurationBuilder();
         builder.setOAuthConsumerKey(TWITTER_CONSUMER_KEY)

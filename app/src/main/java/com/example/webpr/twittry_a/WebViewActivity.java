@@ -12,7 +12,7 @@ import com.example.webpr.twittry_a.services.LoginIntentService;
 
 public class WebViewActivity extends AppCompatActivity {
 
-    WebView webView;
+    private WebView webView;
 
     public static String EXTRA_URL = "extra_url";
     @Override

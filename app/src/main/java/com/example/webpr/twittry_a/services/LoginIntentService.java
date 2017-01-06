@@ -59,6 +59,10 @@ public class LoginIntentService extends IntentService {
         }
     }
 
+    /**
+     * Sends broadcast than contains twitter auth url to existing {@link android.content.BroadcastReceiver}
+     * @param twitterAuthUrl {@link String}
+     */
     private void sendLocalBroadcast(String twitterAuthUrl){
         Intent twitterAuthUrlIntent = new Intent(MainActivity.LOGIN_TO_TWITTER_ACTION);
         twitterAuthUrlIntent.putExtra(TWITTER_AUTH_URL, twitterAuthUrl);

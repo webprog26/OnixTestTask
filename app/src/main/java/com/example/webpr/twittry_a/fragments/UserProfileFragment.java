@@ -3,6 +3,7 @@ package com.example.webpr.twittry_a.fragments;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -76,10 +77,13 @@ public class UserProfileFragment extends TwitterFragment{
                 }).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<Bitmap>() {
                     @Override
-                    public void onCompleted() {}
+                    public void onCompleted() {
+                        Log.i(TAG, "onCompleted() ");
+                    }
 
                     @Override
                     public void onError(Throwable e) {
+                        Log.i(TAG, "onError(Throwable e)");
                         e.printStackTrace();
                         if(mProgressBar.getVisibility() == View.VISIBLE){
                             mProgressBar.setVisibility(View.GONE);
@@ -88,9 +92,12 @@ public class UserProfileFragment extends TwitterFragment{
 
                     @Override
                     public void onNext(Bitmap bitmap) {
+                        Log.i(TAG, "onNext(Bitmap bitmap)");
                         if(mProgressBar.getVisibility() == View.VISIBLE){
                             mProgressBar.setVisibility(View.GONE);
                         }
+                        Log.i(TAG, "onNext mProgressBar.getVisibility() " + mProgressBar.getVisibility());
+
                         mIvUserProfile.setImageBitmap(bitmap);
                         mTvUserName.setText(mUser.getScreenName());
                     }

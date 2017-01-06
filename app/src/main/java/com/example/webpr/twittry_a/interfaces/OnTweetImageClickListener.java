@@ -9,5 +9,9 @@ import android.widget.ImageView;
 
 public interface OnTweetImageClickListener {
 
+    /**
+     * Handles on tweet image click event
+     * @param bitmapUrl {@link String}
+     */
     public void onTweetImageClick(String bitmapUrl);
 }
