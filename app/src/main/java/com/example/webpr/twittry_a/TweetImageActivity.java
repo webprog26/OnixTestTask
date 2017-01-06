@@ -1,21 +1,15 @@
 package com.example.webpr.twittry_a;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.example.webpr.twittry_a.managers.BitmapDownloader;
 
 import rx.Subscriber;
@@ -32,7 +26,7 @@ public class TweetImageActivity extends AppCompatActivity {
     private Subscription mTweetImageSubscription;
 
 
-    private ImageView mIvTweetImageSeparateView;
+    private SubsamplingScaleImageView mIvTweetImageSeparateView;
     private ProgressBar mProgressBar;
 
 
@@ -43,10 +37,17 @@ public class TweetImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tweet_image);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setTitle("Image");
+
 
 
         mProgressBar = (ProgressBar) findViewById(R.id.pbTweetImageLoading);
-        mIvTweetImageSeparateView = (ImageView) findViewById(R.id.ivTweetImageSeparateView);
+        mIvTweetImageSeparateView = (SubsamplingScaleImageView) findViewById(R.id.ivTweetImageSeparateView);
+        mIvTweetImageSeparateView.setZoomEnabled(true);
+        mIvTweetImageSeparateView.setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER);
 
         if(null != getIntent()){
             String tweetImageBitmapUrl = getIntent().getStringExtra(TWEET_IMAGE_SEPARATE_VIEW);
@@ -80,7 +81,7 @@ public class TweetImageActivity extends AppCompatActivity {
                                     mProgressBar.setVisibility(View.GONE);
                                 }
                                 Log.i(TAG, "onNext(Bitmap bitmap)");
-                                mIvTweetImageSeparateView.setImageBitmap(bitmap);
+                                mIvTweetImageSeparateView.setImage(ImageSource.bitmap(bitmap));
                             }
                         });
                         tweetImagePublishSubject.onNext(tweetImageBitmapUrl);
