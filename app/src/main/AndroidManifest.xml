@@ -41,7 +41,8 @@
         <activity
             android:name=".InnerActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".TweetImageActivity"></activity>
+        <activity android:name=".TweetImageActivity"
+            android:parentActivityName=".InnerActivity"></activity>
     </application>
 
 </manifest>
