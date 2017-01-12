@@ -277,6 +277,7 @@ public class InnerActivity extends AppCompatActivity implements NavigationView.O
                 }
                 break;
             case R.id.ibDescription:
+                Log.i(TAG, "Description button clicked!");
                 if(null != mViewPagerAdapter){
                     TimelineFragment newslineFragment = (TimelineFragment) mViewPagerAdapter.getNewslineFragment();
                     if(null != newslineFragment){

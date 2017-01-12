@@ -69,7 +69,11 @@ public class TweetsListAdapter extends RecyclerView.Adapter<TweetsListAdapter.Tw
                 }
             });
         }
+    }
 
+    public void updateData(List<Tweet> data){
+        this.mTweets = data;
+        notifyDataSetChanged();
     }
 
 }

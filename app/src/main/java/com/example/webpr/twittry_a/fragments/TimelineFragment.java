@@ -2,6 +2,8 @@ package com.example.webpr.twittry_a.fragments;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -16,7 +18,6 @@ import com.example.webpr.twittry_a.MainActivity;
 import com.example.webpr.twittry_a.R;
 import com.example.webpr.twittry_a.TweetImageActivity;
 import com.example.webpr.twittry_a.adapters.TweetsListAdapter;
-import com.example.webpr.twittry_a.adapters.TweetsListAdapterFull;
 import com.example.webpr.twittry_a.interfaces.OnTweetImageClickListener;
 import com.example.webpr.twittry_a.managers.BitmapDownloader;
 import com.example.webpr.twittry_a.models.Tweet;
@@ -48,8 +49,8 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
     private RecyclerView mRecyclerView;
     private Subscription mUserTimeLineSubscription;
     private ProgressBar mProgressBar;
-    private List<Tweet> mTweetList;
-    private boolean isInFullView = false;
+    private TweetsListAdapter mAdapter;
+    private List<Tweet> mTweets;
 
     @Override
     protected int getLayout() {
@@ -59,7 +60,9 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mTweetList = new ArrayList<>();
+
+        mTweets = new ArrayList<>();
+        mAdapter = new TweetsListAdapter(mTweets, this);
 
         mProgressBar = (ProgressBar) view.findViewById(R.id.progressBar);
 
@@ -67,7 +70,7 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        mRecyclerView.setAdapter(mAdapter);
         PublishSubject<AccessToken> userTimelinePublishSubject = PublishSubject.create();
         mUserTimeLineSubscription = userTimelinePublishSubject.observeOn(Schedulers.io())
                 .map(new Func1<AccessToken, List<Status>>() {
@@ -121,9 +124,8 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
                         if(mProgressBar.getVisibility() == View.VISIBLE){
                             mProgressBar.setVisibility(View.GONE);
                         }
-                        mTweetList = tweets;
-                        TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, TimelineFragment.this);
-                        mRecyclerView.setAdapter(adapter);
+                        mTweets = tweets;
+                        mAdapter.updateData(mTweets);
                     }
                 });
 
@@ -147,15 +149,15 @@ public class TimelineFragment extends TwitterFragment implements OnTweetImageCli
      * Changes the mode of the tweets from short ru fullscreen and backward
      */
     public void changeViewMode(){
-        if(!isInFullView){
-            TweetsListAdapterFull adapter = new TweetsListAdapterFull(mTweetList, TimelineFragment.this);
-            mRecyclerView.setAdapter(adapter);
-            isInFullView = true;
-        } else {
-            TweetsListAdapter adapter = new TweetsListAdapter(mTweetList, TimelineFragment.this);
-            mRecyclerView.setAdapter(adapter);
-            isInFullView = false;
-        }
+        mRecyclerView.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+//                super.getItemOffsets(outRect, view, parent, state);
+                if(view.getVisibility() == View.VISIBLE){
+                    Log.i(TAG, view.toString());
+                }
+            }
+        });
     }
 
     @Override
